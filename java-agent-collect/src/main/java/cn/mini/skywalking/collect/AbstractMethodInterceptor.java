@@ -1,6 +1,6 @@
 package cn.mini.skywalking.collect;
 
-import cn.mini.skywalking.commons.interceptor.StackDepth;
+import cn.mini.skywalking.collect.commons.StackDepth;
 import org.apache.skywalking.apm.agent.core.context.*;
 import org.apache.skywalking.apm.agent.core.context.tag.Tags;
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan;
@@ -11,11 +11,11 @@ import org.apache.skywalking.apm.network.trace.component.ComponentsDefine;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static cn.mini.skywalking.commons.Constants.*;
+import static cn.mini.skywalking.collect.commons.Constants.*;
 
 import java.lang.reflect.Method;
 
-public abstract class AbstractMethodInterceptor{
+public abstract class AbstractMethodInterceptor {
 
     /**
      * spring mvc插件的进行链路数据采集的入口
@@ -32,6 +32,7 @@ public abstract class AbstractMethodInterceptor{
 
         // 获取当前的请求
         final HttpServletRequest httpServletRequest = (HttpServletRequest) ContextManager.getRuntimeContext().get(REQUEST_KEY_IN_RUNTIME_CONTEXT);
+
 
         if (httpServletRequest != null) {
             // 从Context中获取调用栈深度
@@ -53,7 +54,7 @@ public abstract class AbstractMethodInterceptor{
                 // 获取操作名称，这里做了简化
                 String operationName = this.buildOperationName();
 
-                // 创建一个span，并往span里面塞入信息
+                // 创建一个span，由于是当前服务的第一个span，故使用entry span
                 AbstractSpan span = ContextManager.createEntrySpan(operationName, contextCarrier);
                 Tags.URL.set(span, httpServletRequest.getRequestURL().toString());
                 Tags.HTTP.METHOD.set(span, httpServletRequest.getMethod());

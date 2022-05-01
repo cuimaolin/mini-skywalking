@@ -1,4 +1,4 @@
-package cn.mini.skywalking.commons.interceptor;
+package cn.mini.skywalking.collect.commons;
 
 public class StackDepth {
     private int stackDepth;

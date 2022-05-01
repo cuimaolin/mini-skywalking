@@ -12,6 +12,7 @@
     <modules>
         <module>java-agent-init</module>
         <module>java-agent-collect</module>
+        <module>java-agent-data</module>
     </modules>
     
 </project>

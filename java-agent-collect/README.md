@@ -4,7 +4,7 @@ skywalking java agent进行trance数据收集
 
 本部分以spring mvc为例，可参考[AbstractMethodInterceptor](src/main/java/cn/mini/skywalking/collect/AbstractMethodInterceptor.java)，其主要有实现了beforeMethod和afterMethod两种方法
 
-其分别在指定方法执行前和执行后执行。
+该插件会去增强所有被@requestMapping注释的方法，其分别在指定方法执行前和执行后执行。
 
 对于beforeMethod，其主要逻辑如下：
 
