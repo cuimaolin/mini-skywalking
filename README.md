@@ -4,4 +4,4 @@
 
 目前包括：
 
-- java-agent-init. java agent初始化的核心代码，如果做字节码侵入的核心实现
+- java-agent-init. java agent初始化的核心代码，如何做字节码侵入的核心实现

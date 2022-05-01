@@ -4,22 +4,12 @@ import cn.mini.skywalking.plugin.AbstractClassEnhancePluginDefine;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.FieldAccessor;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.bind.annotation.Morph;
-import net.bytebuddy.implementation.bind.annotation.TargetMethodAnnotationDrivenBinder;
-import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.skywalking.apm.agent.core.plugin.EnhanceContext;
 import org.apache.skywalking.apm.agent.core.plugin.PluginException;
-import org.apache.skywalking.apm.agent.core.plugin.bootstrap.BootstrapInstrumentBoost;
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.ConstructorInterceptPoint;
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.EnhanceException;
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.EnhancedInstance;
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.OverrideCallable;
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.StaticMethodsInterV2;
-import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.StaticMethodsInterV2WithOverrideArgs;
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.v2.InstanceMethodsInterceptV2Point;
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.v2.StaticMethodsInterceptV2Point;
-import org.apache.skywalking.apm.util.StringUtil;
 
 import java.lang.reflect.Type;
 
@@ -31,8 +21,6 @@ public abstract class ClassEnhancePluginDefineV2 extends AbstractClassEnhancePlu
 
         // 找到目标类执行静态方法之前需要执行的方法，并放入数组
         StaticMethodsInterceptV2Point[] staticMethodsInterceptV2Points = this.getStaticMethodsInterceptV2Points();
-        // 目标类的全路径
-        String enhanceOriginClassName = typeDescription.getTypeName();
         // 不为null并且长度不为0，则进行增强
         if (staticMethodsInterceptV2Points != null && staticMethodsInterceptV2Points.length != 0) {
             StaticMethodsInterceptV2Point[] var6 = staticMethodsInterceptV2Points;
@@ -59,8 +47,6 @@ public abstract class ClassEnhancePluginDefineV2 extends AbstractClassEnhancePlu
         ConstructorInterceptPoint[] constructorInterceptPoints = this.getConstructorsInterceptPoints();
         // 找到目标类执行方法的时候需要执行的方法，并放入数组
         InstanceMethodsInterceptV2Point[] instanceMethodsInterceptV2Points = this.getInstanceMethodsInterceptV2Points();
-        // 目标类的全路径
-        String enhanceOriginClassName = typeDescription.getTypeName();
 
         // 用于判断是否需要增强构造器
         boolean existedConstructorInterceptPoint = false;
@@ -88,31 +74,31 @@ public abstract class ClassEnhancePluginDefineV2 extends AbstractClassEnhancePlu
             context.extendObjectCompleted();
         }
 
-        int var11;
-        int var12;
-
-        // 增强构造器
+        // 增强构造器，将定义好的增强方法代理到构造器上
         if (existedConstructorInterceptPoint) {
             ConstructorInterceptPoint[] var10 = constructorInterceptPoints;
-            var11 = constructorInterceptPoints.length;
+            int var11 = constructorInterceptPoints.length;
 
-            for(var12 = 0; var12 < var11; ++var12) {
+            for(int var12 = 0; var12 < var11; ++var12) {
                 ConstructorInterceptPoint constructorInterceptPoint = var10[var12];
                 // 用 constructorInterceptPoint去操作 newClassBuilder 对象修改字节码
+                // 这里忽略
             }
         }
 
+        // 增强指定方法，将定义好的增强方法代理到指定方法上
         if (existedMethodsInterceptV2Points) {
             InstanceMethodsInterceptV2Point[] var16 = instanceMethodsInterceptV2Points;
-            var11 = instanceMethodsInterceptV2Points.length;
+            int var11 = instanceMethodsInterceptV2Points.length;
 
-            for(var12 = 0; var12 < var11; ++var12) {
+            for(int var12 = 0; var12 < var11; ++var12) {
                 InstanceMethodsInterceptV2Point instanceMethodsInterceptV2Point = var16[var12];
                 // 用 instanceMethodsInterceptPoint去操作 newClassBuilder 对象修改字节码
+                // 这里忽略
             }
         }
 
-        return (DynamicType.Builder)newClassBuilder;
+        return newClassBuilder;
     }
 
 }
