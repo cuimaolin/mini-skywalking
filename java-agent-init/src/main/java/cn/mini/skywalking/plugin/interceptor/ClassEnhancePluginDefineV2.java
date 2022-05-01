@@ -29,6 +29,7 @@ public abstract class ClassEnhancePluginDefineV2 extends AbstractClassEnhancePlu
             for(int var8 = 0; var8 < var7; ++var8) {
                 StaticMethodsInterceptV2Point staticMethodsInterceptV2Point = var6[var8];
                 // 用 staticMethodsInterceptV2Point去操作 newClassBuilder 对象修改字节码
+                // 这里忽略
 
             }
 
