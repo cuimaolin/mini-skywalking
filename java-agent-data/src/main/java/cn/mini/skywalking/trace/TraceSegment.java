@@ -31,50 +31,54 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * {@link TraceSegment} is a segment or fragment of the distributed trace. See https://github.com/opentracing/specification/blob/master/specification.md#the-opentracing-data-model
- * A {@link TraceSegment} means the segment, which exists in current {@link Thread}. And the distributed trace is formed
- * by multi {@link TraceSegment}s, because the distributed trace crosses multi-processes, multi-threads. <p>
+ * TraceSegment是分布式链路的一段，用于记录当前线程的链路
+ * 一条分布式链路可能包含多条TraceSegment，因此是跨进程（例如RPC、MQ等），跨线城（例如并发执行、异步回调等）
  */
 public class TraceSegment {
+
     /**
-     * The id of this trace segment. Every segment has its unique-global-id.
+     * traceSegment的编号，每个segment具有其全局唯一的id
      */
     private String traceSegmentId;
 
     /**
-     * The refs of parent trace segments, except the primary one. For most RPC call, {@link #ref} contains only one
-     * element, but if this segment is a start span of batch process, the segment faces multi parents, at this moment,
-     * we only cache the first parent segment reference.
-     * <p>
-     * This field will not be serialized. Keeping this field is only for quick accessing.
+     * 当前TraceSegment的父segment
+     * 对于大多数的RPC调用，ref仅有一个父节点
+     * 但是如果这个segment是批处理进程的一个开始span，则有多个父节点。这时仅记录第一个父节点
      */
     private TraceSegmentRef ref;
 
     /**
-     * The spans belong to this trace segment. They all have finished. All active spans are hold and controlled by
-     * "skywalking-api" module.
+     * 属于当前segment的span
      */
     private List<AbstractTracingSpan> spans;
 
     /**
-     * The <code>relatedGlobalTraceId</code> represent the related trace. Most time it related only one
-     * element, because only one parent {@link TraceSegment} exists, but, in batch scenario, the num becomes greater
-     * than 1, also meaning multi-parents {@link TraceSegment}. But we only related the first parent TraceSegment.
+     * TraceSegmentRef的trace id
      */
     private DistributedTraceId relatedGlobalTraceId;
 
+    /**
+     * 是否忽略该条TraceSegment
+     */
     private boolean ignore = false;
 
+    /**
+     * span的数量是否超过上限（用户可配置）。若超过上线，则不在记录Span
+     */
     private boolean isSizeLimited = false;
 
     private final long createTime;
 
     /**
-     * Create a default/empty trace segment, with current time as start time, and generate a new segment id.
+     * TraceSegment的构造函数
      */
     public TraceSegment() {
+        // 生成id对象，赋值给traceSegmentId
         this.traceSegmentId = GlobalIdGenerator.generate();
+        // AbstractSpan#finish(TraceSegment) 调用，添加到spans数组中
         this.spans = new LinkedList<>();
+        // 创建NewDistributedTraceId对象，赋值给relatedGlobalTraceI
         this.relatedGlobalTraceId = new NewDistributedTraceId();
         this.createTime = System.currentTimeMillis();
     }
@@ -91,7 +95,8 @@ public class TraceSegment {
     }
 
     /**
-     * Establish the line between this segment and the relative global trace id.
+     * 添加DistributedTraceId 对象
+     * 被 TracingContext#continued 或 TracingContext#extract(ContextCarrier) 方法调用
      */
     public void relatedGlobalTrace(DistributedTraceId distributedTraceId) {
         if (relatedGlobalTraceId instanceof NewDistributedTraceId) {
@@ -170,9 +175,5 @@ public class TraceSegment {
     @Override
     public String toString() {
         return "TraceSegment{" + "traceSegmentId='" + traceSegmentId + '\'' + ", ref=" + ref + ", spans=" + spans + "}";
-    }
-
-    public long createTime() {
-        return this.createTime;
     }
 }

@@ -26,14 +26,28 @@ import org.apache.skywalking.apm.network.language.agent.v3.RefType;
 import org.apache.skywalking.apm.network.language.agent.v3.SegmentReference;
 
 /**
- * {@link TraceSegmentRef} is like a pointer, which ref to another {@link org.apache.skywalking.apm.agent.core.context.trace.TraceSegment}, use {@link #spanId} point to
- * the exact span of the ref {@link TraceSegment}.
- * <p>
+ * TraceSegment指向的类型，通过traceSegmentId和spanId属性，其指向父级TraceSegment的指定span
  */
 public class TraceSegmentRef {
+
+    /**
+     * 指向SegmentRefType类型。不同的指向类型，使用不同的构造方法
+     * CROSS_PROCESS，跨进程，例如远程调用，对应构造方法 TraceSegmentRef(ContextCarrier)
+     * CROSS_THREAD，跨线程，例如异步线程任务，对应构造方法 TraceSegmentRef(ContextSnapshot)
+     */
     private SegmentRefType type;
+
+    /**
+     * 父SegmentRef的traceId
+     */
     private String traceId;
+    /**
+     * 父TraceSegment id
+     */
     private String traceSegmentId;
+    /**
+     * 父span 编号
+     */
     private int spanId;
     private String parentService;
     private String parentServiceInstance;
