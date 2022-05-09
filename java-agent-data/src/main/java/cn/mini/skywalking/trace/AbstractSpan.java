@@ -69,5 +69,8 @@ public interface AbstractSpan extends AsyncSpan {
      */
     AbstractSpan start(long startTime);
 
+    /**
+     * 设置节点
+     */
     AbstractSpan setPeer(String remotePeer);
 }

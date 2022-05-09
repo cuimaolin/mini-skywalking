@@ -18,14 +18,11 @@
 
 package cn.mini.skywalking.trace;
 
-import org.apache.skywalking.apm.agent.core.conf.Config;
 import org.apache.skywalking.apm.agent.core.context.ids.DistributedTraceId;
 import org.apache.skywalking.apm.agent.core.context.ids.GlobalIdGenerator;
 import org.apache.skywalking.apm.agent.core.context.ids.NewDistributedTraceId;
-import org.apache.skywalking.apm.agent.core.context.trace.AbstractSpan;
 import org.apache.skywalking.apm.agent.core.context.trace.AbstractTracingSpan;
 import org.apache.skywalking.apm.agent.core.context.trace.TraceSegmentRef;
-import org.apache.skywalking.apm.network.language.agent.v3.SegmentObject;
 
 import java.util.LinkedList;
 import java.util.List;
