@@ -68,6 +68,9 @@ public class TraceSegment {
      */
     private boolean isSizeLimited = false;
 
+    /**
+     * 创建时间
+     */
     private final long createTime;
 
     /**
@@ -83,97 +86,4 @@ public class TraceSegment {
         this.createTime = System.currentTimeMillis();
     }
 
-    /**
-     * Establish the link between this segment and its parents.
-     *
-     * @param refSegment {@link TraceSegmentRef}
-     */
-    public void ref(TraceSegmentRef refSegment) {
-        if (null == ref) {
-            this.ref = refSegment;
-        }
-    }
-
-    /**
-     * 添加DistributedTraceId 对象
-     * 被 TracingContext#continued 或 TracingContext#extract(ContextCarrier) 方法调用
-     */
-    public void relatedGlobalTrace(DistributedTraceId distributedTraceId) {
-        if (relatedGlobalTraceId instanceof NewDistributedTraceId) {
-            this.relatedGlobalTraceId = distributedTraceId;
-        }
-    }
-
-    /**
-     * After {@link AbstractSpan} is finished, as be controller by "skywalking-api" module, notify the {@link
-     * TraceSegment} to archive it.
-     */
-    public void archive(AbstractTracingSpan finishedSpan) {
-        spans.add(finishedSpan);
-    }
-
-    /**
-     * Finish this {@link TraceSegment}. <p> return this, for chaining
-     */
-    public TraceSegment finish(boolean isSizeLimited) {
-        this.isSizeLimited = isSizeLimited;
-        return this;
-    }
-
-    public String getTraceSegmentId() {
-        return traceSegmentId;
-    }
-
-    /**
-     * Get the first parent segment reference.
-     */
-    public TraceSegmentRef getRef() {
-        return ref;
-    }
-
-    public DistributedTraceId getRelatedGlobalTrace() {
-        return relatedGlobalTraceId;
-    }
-
-    public boolean isSingleSpanSegment() {
-        return this.spans != null && this.spans.size() == 1;
-    }
-
-    public boolean isIgnore() {
-        return ignore;
-    }
-
-    public void setIgnore(boolean ignore) {
-        this.ignore = ignore;
-    }
-
-    /**
-     * This is a high CPU cost method, only called when sending to collector or test cases.
-     *
-     * @return the segment as GRPC service parameter
-     */
-    public SegmentObject transform() {
-        SegmentObject.Builder traceSegmentBuilder = SegmentObject.newBuilder();
-        traceSegmentBuilder.setTraceId(getRelatedGlobalTrace().getId());
-        /*
-         * Trace Segment
-         */
-        traceSegmentBuilder.setTraceSegmentId(this.traceSegmentId);
-        // Don't serialize TraceSegmentReference
-
-        // SpanObject
-        for (AbstractTracingSpan span : this.spans) {
-            traceSegmentBuilder.addSpans(span.transform());
-        }
-        traceSegmentBuilder.setService(Config.Agent.SERVICE_NAME);
-        traceSegmentBuilder.setServiceInstance(Config.Agent.INSTANCE_NAME);
-        traceSegmentBuilder.setIsSizeLimited(this.isSizeLimited);
-
-        return traceSegmentBuilder.build();
-    }
-
-    @Override
-    public String toString() {
-        return "TraceSegment{" + "traceSegmentId='" + traceSegmentId + '\'' + ", ref=" + ref + ", spans=" + spans + "}";
-    }
 }

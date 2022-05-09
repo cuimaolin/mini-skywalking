@@ -1,4 +1,4 @@
-package cn.mini.skywalking.span;
+package cn.mini.skywalking.trace;
 
 import org.apache.skywalking.apm.agent.core.context.AsyncSpan;
 import org.apache.skywalking.apm.agent.core.context.tag.AbstractTag;
@@ -7,19 +7,19 @@ import org.apache.skywalking.apm.agent.core.context.trace.TraceSegmentRef;
 import org.apache.skywalking.apm.network.trace.component.Component;
 
 public interface AbstractSpan extends AsyncSpan {
+
     /**
      * 设置component名称，例如MongoDB、SpringMVC、Tomcat等
-     * 在ComponentsDefine中已经定义了支持的Component
      */
     AbstractSpan setComponent(Component component);
 
     /**
-     * 设置spanLayer
+     * 设置spanLayer，例如DB、RPC_FRAMEWORK、HTTP、Cache、MQ等
      */
     AbstractSpan setLayer(SpanLayer layer);
 
     /**
-     * 设置键值对的标签。可以调用多次，构成span的标签几何
+     * 设置键值对的标签。可以调用多次，构成span的标签集合
      */
     AbstractSpan tag(AbstractTag<?> tag, String value);
 
@@ -49,19 +49,24 @@ public interface AbstractSpan extends AsyncSpan {
     AbstractSpan start();
 
     /**
-     * 获得span的id，一个整数，在TraceSegment内唯一
+     * 获得span的id，在TraceSegment内唯一
+     * 其会在创建span对象时自动生成
      */
     int getSpanId();
 
+    /**
+     * 获得操作名称
+     */
     String getOperationName();
 
     /**
-     * Reference other trace segment.
-     *
-     * @param ref segment ref
+     * 设置父TraceSegment
      */
     void ref(TraceSegmentRef ref);
 
+    /**
+     * 设置开始时间
+     */
     AbstractSpan start(long startTime);
 
     AbstractSpan setPeer(String remotePeer);
