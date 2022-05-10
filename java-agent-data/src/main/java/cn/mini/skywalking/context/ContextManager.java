@@ -28,9 +28,14 @@ public class ContextManager implements BootService {
     public ContextManager() {
     }
 
+    /**
+     * 获取AbstractTracerContext对象。若不存在，进行创建
+     */
     private static AbstractTracerContext getOrCreate(String operationName, boolean forceSampling) {
         AbstractTracerContext context = CONTEXT.get();
+        // 不存在则创造
         if (context == null) {
+            // 操作名为空，创建IgnoredTracerContext对象
             if (StringUtil.isEmpty(operationName)) {
                 context = new IgnoredTracerContext();
             } else {
@@ -67,21 +72,25 @@ public class ContextManager implements BootService {
     }
 
     public static AbstractSpan createEntrySpan(String operationName, ContextCarrier carrier) {
+        // 获得操作名
         operationName = StringUtil.cut(operationName, Config.Agent.OPERATION_NAME_THRESHOLD);
         AbstractSpan span;
         AbstractTracerContext context;
+        // 如果carrier不为null且有效
         if (carrier != null && carrier.isValid()) {
+            // 强制收集链路数据
             SamplingService samplingService = (SamplingService)ServiceManager.INSTANCE.findService(SamplingService.class);
             samplingService.forceSampled();
+            // 获取AbstractTracerContext
             context = getOrCreate(operationName, true);
-            span = context.createEntrySpan(operationName);
+            // 提取carrier的数据到context，跨进程，接受上下文
             context.extract(carrier);
         } else {
             context = getOrCreate(operationName, false);
-            span = context.createEntrySpan(operationName);
         }
 
-        return span;
+        // 创建EntrySpan
+        return context.createEntrySpan(operationName);
     }
 
     public static AbstractSpan createLocalSpan(String operationName) {

@@ -18,7 +18,7 @@ TraceSegment是分布式链路追踪的一段，其具体实现类可以参考[T
 - 一条分布式链路可能包含多条TraceSegment，因此是跨进程（例如RPC、MQ等），跨线城（例如并发执行、异步回调等）
 
 
-## Span
+### Span
 
 来自[《OpenTracing语义标准》](https://github.com/opentracing-contrib/opentracing-specification-zh/blob/master/specification.md)
 
@@ -40,3 +40,17 @@ Skywalking定义了多种span类来实现AbstractSpan接口，其类图具体可
 - ExitSpan: 出口span
 
 AbstractTracingSpan的具体实现可以参考[AbstractTracingSpan.java](src/main/java/cn/mini/skywalking/trace/spanImpl/AbstractTracingSpan.java)
+
+## Context
+
+### ContextManager
+
+ContextManager实现了BootService、TracingContextListener、IgnoreTracerContextListener接口，链路追踪上下文管理器
+
+其中CONTEXT属于静态属性，线程变量，存储 AbstractTracerContext 对象
+
+- 一个TraceSegment对象关联一个线程，负责收集该线程的链路追踪数据，因此使用线程变量
+- 一个AbstractTracerContext会关联一个TraceSegment对象，Context负责获取、创建、销毁AbstractTracerContext对象
+
+AbstractTracerContext为Skywalking定义的接口，主要有AbstractTracerContext和IgnoredTracerContext两个实现类，具体实现可以参考[AbstractTracerContext.java](src/main/java/cn/mini/skywalking/context/AbstractTracerContext.java)
+
